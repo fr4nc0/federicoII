@@ -295,6 +295,10 @@ public class BucketBinaryTree implements Tree{
 			 * (LL)B    C(LR)    (LL)C    A(LR) (RL)U   W(RR) 
 			 */
 
+			removeNodeFromLists(k1);	// <-- inutile 
+			removeNodeFromLists(k1.getLeft());
+			removeNodeFromLists(k1.getRight());
+			
 			k1.setSide(Side.NONE);
 			k1.getLeft().setSide(Side.LEFT);
 			k1.getRight().setSide(Side.RIGHT);
@@ -316,6 +320,10 @@ public class BucketBinaryTree implements Tree{
 				 * (LL)B    C(LL)    	  (LL)C    A(LL) (LR)U   W(LR)
 				 */
 
+				//removeNodeFromLists(k1);	// <-- inutile 
+				removeNodeFromLists(k1.getLeft());
+				removeNodeFromLists(k1.getRight());
+				
 				k1.setSide(Side.LEFT);
 				k1.getLeft().setSide(Side.LEFT_LEFT);
 				k1.getRight().setSide(Side.LEFT_RIGHT);
@@ -334,6 +342,11 @@ public class BucketBinaryTree implements Tree{
 				 *      /  \            	   /  \           /  \
 				 * (RL)B    C(RL)    	  (RL)C    A(RL) (RR)U   W(RR)
 				 */
+
+				removeNodeFromLists(k1);	// <-- inutile 
+				removeNodeFromLists(k1.getLeft());
+				removeNodeFromLists(k1.getRight());
+				
 				k1.setSide(Side.RIGHT);
 				k1.getLeft().setSide(Side.RIGHT_LEFT);
 				k1.getRight().setSide(Side.RIGTH_RIGHT);
@@ -444,6 +457,10 @@ public class BucketBinaryTree implements Tree{
 			 * (LL)B    C(LR)    (LL)C    A(LR) (RL)U   W(RR) 
 			 */
 
+			//removeNodeFromLists(k2);	// <-- inutile 
+			removeNodeFromLists(k2.getLeft());
+			removeNodeFromLists(k2.getRight());
+			
 			k2.setSide(Side.NONE);
 			k2.getLeft().setSide(Side.LEFT);
 			k2.getRight().setSide(Side.RIGHT);
@@ -465,6 +482,10 @@ public class BucketBinaryTree implements Tree{
 				 * (LL)B    C(LL)    	  (LL)C    A(LL) (LR)U   W(LR)
 				 */
 
+				removeNodeFromLists(k2);
+				removeNodeFromLists(k2.getLeft());
+				removeNodeFromLists(k2.getRight());
+				
 				k2.setSide(Side.LEFT);
 				k2.getLeft().setSide(Side.LEFT_LEFT);
 				k2.getRight().setSide(Side.LEFT_RIGHT);
@@ -483,6 +504,11 @@ public class BucketBinaryTree implements Tree{
 				 *      /  \            	   /  \           /  \
 				 * (RL)B    C(RL)    	  (RL)C    A(RL) (RR)U   W(RR)
 				 */
+				
+				removeNodeFromLists(k2);
+				removeNodeFromLists(k2.getLeft());
+				removeNodeFromLists(k2.getRight());
+				
 				k2.setSide(Side.RIGHT);
 				k2.getLeft().setSide(Side.RIGHT_LEFT);
 				k2.getRight().setSide(Side.RIGTH_RIGHT);
@@ -506,6 +532,27 @@ public class BucketBinaryTree implements Tree{
 		}
 
 		return k2;
+	}
+
+	private static void removeNodeFromLists(BucketNode node) {
+		
+		if ( node.getSide().equals(Side.LEFT_LEFT) ) {
+			
+			left_leftSideNodes.remove(node);
+		
+		} else if ( node.getSide().equals(Side.LEFT_RIGHT) ) {
+			
+			left_rightSideNodes.remove(node);
+		
+			
+		} else if ( node.getSide().equals(Side.RIGHT_LEFT) ) {
+			
+			right_leftSideNodes.remove(node);
+		
+		} else if ( node.getSide().equals(Side.RIGTH_RIGHT) ) {
+			
+			right_rightSideNodes.remove(node);
+		}
 	}
 
 	private static void changeSideToSubtree(BucketNode node, Side newSide) {
@@ -537,7 +584,8 @@ public class BucketBinaryTree implements Tree{
 
 			if ( ! node.getSide().equals(newSide) ) {
 				
-				Side oldSide = node.getSide(); 
+				removeNodeFromLists(node);
+				//Side oldSide = node.getSide(); 
 				node.setSide(newSide);
 
 				//add
@@ -559,6 +607,7 @@ public class BucketBinaryTree implements Tree{
 				}
 
 				// remove
+				/*
 				if ( oldSide.equals(Side.LEFT_LEFT) ) {
 
 					left_leftSideNodes.remove(node);
@@ -575,10 +624,10 @@ public class BucketBinaryTree implements Tree{
 
 					right_rightSideNodes.remove(node);
 				}
-
+				*/
+				
 				changeSideToSubtree2(node.getRight(), newSide);
 				changeSideToSubtree2(node.getLeft(), newSide);
-
 			}
 		}
 	}
@@ -822,7 +871,7 @@ public class BucketBinaryTree implements Tree{
 	
 	public static void main( String [ ] args ){
 
-		int bucketSize 	= 3;
+		int bucketSize 	= 30;
 		int maxNumPunti	= 8192;
 		int k			= 3;
 		int queryPoint  = 0;
@@ -838,10 +887,12 @@ public class BucketBinaryTree implements Tree{
 				tree.insert2(i);	
 			}
 
+			/*
 			System.out.println("LL: " + tree.left_leftSideNodes.size() +
 					" LR: " + tree.left_rightSideNodes.size() + 
 					" RL: " + tree.right_leftSideNodes.size() + 
 					" RR: " + tree.right_rightSideNodes.size());
+			*/
 			
 			System.out.println("n = " + numPunti);
 
@@ -859,7 +910,7 @@ public class BucketBinaryTree implements Tree{
 				sommaPercNoRoot = sommaPercNoRoot + res.percNumNoRoot;
 				sommaPercRoot	= sommaPercRoot + res.percNumRoot;
 				
-				System.out.println(res.percNumRoot + " --" + res.percNumNoRoot );
+				//System.out.println(res.percNumRoot + " --" + res.percNumNoRoot );
 				//System.out.println(sommaPercRoot + " --" + sommaPercNoRoot );
 			}
 
@@ -1247,13 +1298,14 @@ public class BucketBinaryTree implements Tree{
 					}
 				}
 			}
-			
-			double num1 = r.numRoot * 100;
-			double num2 = r.numNoRoot * 100;
-
-			r.percNumRoot   = (num1 / numProve);
-			r.percNumNoRoot = (num2 / numProve);
 		}
+		
+		double num1 = r.numRoot * 100;
+		double num2 = r.numNoRoot * 100;
+
+		r.percNumRoot   = (num1 / numProve);
+		r.percNumNoRoot = (num2 / numProve);
+
 		return r;
 	}
 

@@ -349,9 +349,7 @@ public class BucketNode implements Node {
 				
 				// the parent is a common node
 				leftNode.setSide(parentNode.side);
-				left_leftSideNodes.add(leftNode);
 				rightNode.setSide(parentNode.side);
-				left_rightSideNodes.add(rightNode);
 				
 				if ( parentNode.getSide().equals(Side.LEFT_LEFT) ) {
 					
