@@ -1,6 +1,8 @@
 package graphics;
 
 
+import static org.junit.Assert.assertArrayEquals;
+
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -22,6 +24,7 @@ import binaryTrees.TestResult;
 
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.io.IOException;
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -230,8 +233,12 @@ public class DisplayTree extends JPanel implements TreeSelectionListener {
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 
-				drawKdTree();
-				//drawTree();
+				//executeCorrectnessTests();
+				
+				//testStartingNodeKdTree();
+				//preliminaryTestRandomQueriesCorrectness();
+
+				drawTree();
 				//executeTests2();
 				//drawTree();
 				//executeTests();
@@ -240,13 +247,26 @@ public class DisplayTree extends JPanel implements TreeSelectionListener {
 			private void drawTree() {
 
 				int bucketSize = 3;
-				int numPunti   = 256;
+				int numPunti   = 8;
 				BucketBinaryTree tree = new BucketBinaryTree(bucketSize);
 
 				for (int i = 0; i < numPunti; i++) {
-					tree.insert(i);	
+					//tree.insert(i);
+					tree.insert2(i);
 				}
 
+				/*
+				System.out.println("All: " + tree.allNodes.size() + 
+						" L: " + tree.leftSideNodes.size() + 
+						" R: " + tree.rightSideNodes.size());
+				*/
+				
+				System.out.println("All: " + tree.allNodes.size() + 
+						" LL: " + tree.left_leftSideNodes.size() +
+						" LR: " + tree.left_rightSideNodes.size() + 
+						" RL: " + tree.right_leftSideNodes.size() + 
+						" RR: " + tree.right_rightSideNodes.size());
+				
 				showTree(tree);
 
 				/*
@@ -261,32 +281,211 @@ public class DisplayTree extends JPanel implements TreeSelectionListener {
 				 */
 			}
 
-			private void drawKdTree() {
+			private void testStartingNodeKdTree() {
 
-				int bucketSize = 2;
-				int numPunti   = 5;
-				KdTree tree = new KdTree(bucketSize, new EuclideanDistance());
+				int bucketSize 		= 2;
+				int maxCoordValue   = 5;
 
-				Point[] points = new Point[numPunti * numPunti];
+				KdTree tree = KdTree.buildSampleKdTree(bucketSize, maxCoordValue);
 
-				for (int i = 0; i < numPunti; i++) {
-					for (int j = 0; j < numPunti; j++) {
-						Point p = new Point( (double)i, (double)j);
-						points[j + numPunti*i] = p;
-					}		
-				}
-
-				tree.bulkLoad(points, bucketSize);
-				showTree(tree);
 				/*
-				Point queryPoint = new Point(0, 1);
-				int k = 4;
+				 * display the kd tree
+				 */
+				showTree(tree);
+
+				/*
+				 * query info
+				 */
+				Point queryPoint = new Point(2, 1);
+				int k = 5;
+
+				/*
+				 * test the starting query node selection using 4 different ways
+				 */
+				TestResult tr = null;
+				tr = tree.testFindStartingNode(tree, queryPoint);
+				tr.printResults("BASE:");
+
+				tr = tree.testFindStartingNodeSide(tree, queryPoint);
+				tr.printResults("SIDE:");
+
+				tr = tree.testFindStartingNodeMinMax(tree, queryPoint);
+				tr.printResults("MINMAX");
+
+				tr = tree.testFindStartingNodeMinMaxSide(tree, queryPoint);
+				tr.printResults("SIDE-MINMAX");
+			}
+
+			private void preliminaryTestRandomQueriesCorrectness() {
+
+				int bucketSize 		= 2;
+				int maxCoordValue   = 5;
+
+				KdTree tree = KdTree.buildSampleKdTree(bucketSize, maxCoordValue);
+
+				/*
+				 * display the kd tree
+				 */
+				showTree(tree);
+
+				/*
+				 * query info
+				 */
+				Point queryPoint = new Point(2, 1);
+				int k = 5;
+
+
 				KdResult result = tree.nearestQuery(queryPoint, k);
-				System.out.println();
-				*/
-				
+				System.out.println(result);
+
+				KdResult resultRandom = tree.randomNearestQuery
+						(queryPoint, k, true, false);
+				System.out.println(resultRandom);
+
+
 
 			}
+
+			private void executeCorrectnessTests() {
+				/*
+				 * parametri del kd tree
+				 */
+				int bucketSize = 0;
+				int maxCoordValue   = 5;
+
+				for ( bucketSize = 2; bucketSize < 3; bucketSize ++) {
+					for ( maxCoordValue = 5; maxCoordValue < 6; maxCoordValue++ ) {
+
+						/*
+						 * creazione kd tree
+						 */
+						KdTree tree = KdTree.buildSampleKdTree(bucketSize, maxCoordValue);
+
+
+						/*
+						 * parametri della query
+						 */
+						int maxK = 5;
+						int minCoordValue = maxCoordValue -1;
+						int XqueryPointCood = 0, YQueryPointCoord = 0;
+
+						for ( XqueryPointCood = minCoordValue; XqueryPointCood < maxCoordValue; XqueryPointCood++) {
+							for ( YQueryPointCoord = minCoordValue; YQueryPointCoord < maxCoordValue; YQueryPointCoord++) {
+
+								/*
+								 * costruzione della query
+								 */
+								Point queryPoint = new Point(XqueryPointCood, YQueryPointCoord);
+
+
+								/*
+								 * manca: ciclo su tutti i nodi come random node
+								 */
+								for ( int k = 1; k <= maxK; k++) {
+
+									System.out.println(" query: k=" + k + " query point=" + queryPoint);
+									/*
+									 * esecuzione delle query
+									 */
+									KdResult result = tree.nearestQuery(queryPoint, k);
+									Point[] sortedResults = getSortedArray(result);
+									System.out.println("OK " + result);
+									
+									// NO MinMax - NO Side
+									KdResult resultRandomNOMinMaxNOSide = 
+											tree.randomNearestQuery(queryPoint, k, false, false);
+									Point[] sortedResultNOMinMaxNOSide = 
+											getSortedArray(resultRandomNOMinMaxNOSide);
+									System.out.println("OK " + resultRandomNOMinMaxNOSide);
+									
+									
+									// MinMax - NO Side 
+									KdResult resultRandomMinMaxNOSide = 
+											tree.randomNearestQuery(queryPoint, k, true, false);
+									Point[] sortedResultMinMaxNOSide = 
+											getSortedArray(resultRandomMinMaxNOSide);
+									System.out.println("OK" + resultRandomMinMaxNOSide);
+									
+									
+									// NO MinMax - Side
+									KdResult resultRandomNOMinMaxSide = 
+											tree.randomNearestQuery(queryPoint, k, false, true);
+									Point[] sortedResultNOMinMaxSide = 
+											getSortedArray(resultRandomNOMinMaxSide);
+									System.out.println("OK" + resultRandomNOMinMaxSide);
+									
+									// MinMax - Side
+									KdResult resultRandomMinMaxSide = 
+											tree.randomNearestQuery(queryPoint, k, true, true);
+									Point[] sortedResultMinMaxSide = 
+											getSortedArray(resultRandomMinMaxSide);
+									System.out.println("OK" + resultRandomMinMaxSide);
+
+
+									if ( ! isEqual(sortedResults, sortedResultNOMinMaxNOSide)) {
+										System.err.println(" errore: no MinMax no side");
+									}
+									if ( ! isEqual(sortedResults, sortedResultMinMaxNOSide)) {
+										System.err.println(" errore: MinMax no side");
+									}
+									if ( ! isEqual(sortedResults, sortedResultNOMinMaxSide)) {
+										System.err.println(" errore: no MinMax side");
+									}
+									if ( ! isEqual(sortedResults, sortedResultMinMaxSide)) {
+										System.err.println(" errore: MinMax side");
+									}
+
+								}
+							}
+						}
+					}
+				}
+			}
+
+			private boolean isEqual(Point[] a1,	Point[] a2) {
+
+				if ( a1.length != a2.length ) {
+					return false;
+				}
+				
+				for ( int i = 0; i < a1.length; i++) {
+					if ( ! a1[i].equals(a2[i]) ) {
+						return false;
+					}
+				}
+				
+				return true;
+			}
+
+			private Point[] getSortedArray(KdResult result) {
+
+				Point[] res = result.getPoints();
+
+				Arrays.sort(res, new Comparator<Point>() {
+
+					public int compare(Point point1, Point point2) {
+						Double x1 = point1.get(0);
+						Double x2 = point2.get(0);
+
+						if ( ! x1.equals(x2) ) {
+
+							// sort by x-coord only
+							return x1.compareTo(x2);
+
+						} else {
+
+							// x-coord are equals the sort by y-coord
+							Double y1 = point1.get(1);
+							Double y2 = point2.get(1);
+
+							return y1.compareTo(y2);
+						}
+					}
+				});
+
+				return res;
+			}	
+
 
 			private void executeTests2() {
 
@@ -350,10 +549,10 @@ public class DisplayTree extends JPanel implements TreeSelectionListener {
 
 						for ( queryPoint = 0; queryPoint < numPunti; queryPoint++) {
 
-							TestResult r1 = tree.testFindStartingNode(tree, queryPoint);
-							TestResult r2 = tree.testFindStartingNodeMinMax(tree, queryPoint);
-							TestResult r3 = tree.testFindStartingNodeSide(tree, queryPoint);
-							TestResult r4 = tree.testFindStartingNodeMinMaxSide(tree, queryPoint);
+							TestResult r1 = tree.testFSN(tree, queryPoint);
+							TestResult r2 = tree.testFSNMinMax(tree, queryPoint);
+							TestResult r3 = tree.testFSNSide(tree, queryPoint);
+							TestResult r4 = tree.testFSNMinMaxSide(tree, queryPoint);
 
 							numTests++;
 

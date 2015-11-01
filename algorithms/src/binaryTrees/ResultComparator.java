@@ -16,8 +16,15 @@ public class ResultComparator implements Comparator<Integer> {
 	@Override
 	public int compare(Integer first, Integer second) {
 		/*
-		 *  note: if the distances are equal the second one wins
+		 *  This method returns zero if the objects are equal. 
+		 *  It returns a positive value if obj1 is greater than obj2. 
+		 *  Otherwise, a negative value is returned
 		 */
+		/*
+		int firstDist  = Distance.oneDimension(first,  this.queryPoint);
+		int secondDist = Distance.oneDimension(second, this.queryPoint);
+		return (firstDist - secondDist);
+		*/
 		return Distance.oneDimension(first, this.queryPoint) < Distance.oneDimension(second, this.queryPoint) ? 1 : -1;
 	}
 }

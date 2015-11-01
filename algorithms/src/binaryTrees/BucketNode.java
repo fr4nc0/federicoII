@@ -23,7 +23,7 @@ public class BucketNode implements Node {
 	private int			maxValue;
 	private Side		side; 
 
-	public enum Side { LEFT, RIGHT, NONE};
+	public enum Side { LEFT, RIGHT, NONE, LEFT_LEFT, LEFT_RIGHT, RIGHT_LEFT, RIGTH_RIGHT};
 
 	public BucketNode(int value, int bucketSize, List<BucketNode> allNodes) {
 
@@ -54,9 +54,9 @@ public class BucketNode implements Node {
 	public String getLabelNode() {
 		String label = "";
 		if ( this.isLeaf() ) {
-			label = this.getBucketAsString() + " " + this.status;
+			label = this.getBucketAsString() + " " + this.side + " " + this.minValue + " " + this.maxValue + " h:" + this.getHeight(); // + " " + this.status ;
 		} else {
-			label = String.valueOf( this.splitValue ) + " " + this.status;
+			label = String.valueOf( this.splitValue ) + " " + this.side + " " + this.minValue + " " + this.maxValue + " h:" + this.getHeight(); // + " " + this.status;
 		}
 		return label ;
 	}
@@ -87,9 +87,9 @@ public class BucketNode implements Node {
 	@Override
 	public String toString() {
 		if (this.isLeaf()) {
-			return "bucket=" + getBucketAsString() + " " + status ;
+			return "bucket=" + getBucketAsString() + " " + status + side;
 		} else {
-			return String.valueOf(splitValue)  + " " + status ;	
+			return String.valueOf(splitValue)  + " " + status + side;	
 		}
 
 	}
@@ -225,6 +225,70 @@ public class BucketNode implements Node {
 		}
 	}
 
+	public void add2(int newValue, int bucketSize, 
+			List<BucketNode> allNodes, 
+			List<BucketNode> left_leftSideNodes,
+			List<BucketNode> left_rightSideNodes, 
+			List<BucketNode> right_leftSideNodes, 
+			List<BucketNode> right_rightSideNodes) {
+
+		if ( index < bucket.length - 1 ) {
+
+			index++;
+			bucket[index] = newValue;
+
+			if ( newValue > maxValue ) {
+				maxValue = newValue;
+			}
+			if ( newValue < minValue ) {
+				minValue = newValue;
+			}
+
+		} else {
+
+			/*
+			 * bucket full: creates two new nodes
+			 */
+
+			BucketNode newLeft = new BucketNode(bucketSize, allNodes);
+			BucketNode newRight = new BucketNode(bucketSize, allNodes);
+			newLeft.setParent(this);
+			newRight.setParent(this);
+
+			assignSide2(this, newLeft, newRight, left_leftSideNodes, left_rightSideNodes,
+					right_leftSideNodes, right_rightSideNodes);
+
+			int[] tmp = new int[bucketSize + 1];
+			System.arraycopy( this.bucket, 0, tmp, 0, this.bucket.length );
+			tmp[tmp.length-1] = newValue;
+			Arrays.sort(tmp);
+
+			int half = (int) Math.ceil(tmp.length/2);
+			this.splitValue = tmp[half];
+
+			for (int i = 0; i < half; i++ ) {
+				newLeft.add2(tmp[i], bucketSize, allNodes, 
+						left_leftSideNodes, left_rightSideNodes,
+						right_leftSideNodes, right_rightSideNodes);
+			}
+
+			for (int i = half; i < tmp.length; i++ ) {
+				newRight.add2(tmp[i], bucketSize, allNodes, 
+						left_leftSideNodes, left_rightSideNodes,
+						right_leftSideNodes, right_rightSideNodes);
+			}
+
+			this.index 		= 0;
+			this.left 		= newLeft;
+			this.right 		= newRight;
+			this.leaf 		= false;
+			this.bucket 	= null;
+			this.height 	= 1;
+			this.minValue 	= newLeft.getMinValue();
+			this.maxValue 	= newRight.getMaxValue();
+		}
+	}
+
 	private void assignSide(BucketNode parentNode, BucketNode leftNode,
 			BucketNode rightNode, List<BucketNode> leftSideNodes, List<BucketNode> rightSideNodes) {
 
@@ -252,6 +316,74 @@ public class BucketNode implements Node {
 		}
 	}
 
+	private void assignSide2(BucketNode parentNode, BucketNode leftNode,
+			BucketNode rightNode, 
+			List<BucketNode> left_leftSideNodes, 
+			List<BucketNode> left_rightSideNodes, 
+			List<BucketNode> right_leftSideNodes, 
+			List<BucketNode> right_rightSideNodes) {
+
+		if (  parentNode.getParent() != null ) { //checks if it is the root
+
+			// the parent is not the root
+			
+			
+			if ( parentNode.getSide().equals(Side.LEFT)) {  
+				// the parent is the left child of the root
+				
+				leftNode.setSide(Side.LEFT_LEFT);
+				left_leftSideNodes.add(leftNode);
+				rightNode.setSide(Side.LEFT_RIGHT);
+				left_rightSideNodes.add(rightNode);
+				
+			} else if ( parentNode.getSide().equals(Side.RIGHT)) { 
+				// the parent is the right child of the root
+				
+				leftNode.setSide(Side.RIGHT_LEFT);
+				right_leftSideNodes.add(leftNode);
+				rightNode.setSide(Side.RIGTH_RIGHT);
+				right_rightSideNodes.add(rightNode);
+				
+				
+			} else {
+				
+				// the parent is a common node
+				leftNode.setSide(parentNode.side);
+				left_leftSideNodes.add(leftNode);
+				rightNode.setSide(parentNode.side);
+				left_rightSideNodes.add(rightNode);
+				
+				if ( parentNode.getSide().equals(Side.LEFT_LEFT) ) {
+					
+					left_leftSideNodes.add(leftNode);
+					left_leftSideNodes.add(rightNode);
+				
+				} else if ( parentNode.getSide().equals(Side.LEFT_RIGHT) ) {
+					
+					left_rightSideNodes.add(leftNode);
+					left_rightSideNodes.add(rightNode);
+				
+					
+				} else if ( parentNode.getSide().equals(Side.RIGHT_LEFT) ) {
+					
+					right_leftSideNodes.add(leftNode);
+					right_leftSideNodes.add(rightNode);
+				
+				} else if ( parentNode.getSide().equals(Side.RIGTH_RIGHT) ) {
+					
+					right_rightSideNodes.add(leftNode);
+					right_rightSideNodes.add(rightNode);
+				}
+			}
+
+		} else {
+
+			// parent is the root 
+			leftNode.setSide(Side.LEFT);
+			rightNode.setSide(Side.RIGHT);
+		}
+	}
+
 	public String getStatus() {
 		return status;
 	}
@@ -268,21 +400,17 @@ public class BucketNode implements Node {
 		this.root = root;
 	}
 
-
 	public int getMinValue() {
 		return minValue;
 	}
-
 
 	public int getMaxValue() {
 		return maxValue;
 	}
 
-
 	public void setMinValue(int minValue) {
 		this.minValue = minValue;
 	}
-
 
 	public void setMaxValue(int maxValue) {
 		this.maxValue = maxValue;
