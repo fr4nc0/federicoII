@@ -33,8 +33,8 @@ public class BucketBinaryTree implements Tree{
 	private final String leftVisited 	= "leftVisited";
 	private final String rightVisited 	= "rightVisited";
 
-	
-	
+
+
 	public Node getRoot() {
 		return root;
 	}
@@ -43,7 +43,7 @@ public class BucketBinaryTree implements Tree{
 		this.root = root;
 	}
 
-	
+
 	/*
 	 * constructor
 	 */
@@ -51,13 +51,13 @@ public class BucketBinaryTree implements Tree{
 		this.bucketSize = bucketSize;
 	}
 
-	
-	
-	
+
+
+
 	/*
 	 * inserts
 	 */
-	
+
 	public void insert(int newValue) {
 
 		if ( root == null) {
@@ -204,9 +204,9 @@ public class BucketBinaryTree implements Tree{
 		return node;
 	}
 
-	
-	
-	
+
+
+
 	/*
 	 * rotations
 	 */
@@ -298,7 +298,7 @@ public class BucketBinaryTree implements Tree{
 			removeNodeFromLists(k1);	// <-- inutile 
 			removeNodeFromLists(k1.getLeft());
 			removeNodeFromLists(k1.getRight());
-			
+
 			k1.setSide(Side.NONE);
 			k1.getLeft().setSide(Side.LEFT);
 			k1.getRight().setSide(Side.RIGHT);
@@ -323,7 +323,7 @@ public class BucketBinaryTree implements Tree{
 				//removeNodeFromLists(k1);	// <-- inutile 
 				removeNodeFromLists(k1.getLeft());
 				removeNodeFromLists(k1.getRight());
-				
+
 				k1.setSide(Side.LEFT);
 				k1.getLeft().setSide(Side.LEFT_LEFT);
 				k1.getRight().setSide(Side.LEFT_RIGHT);
@@ -346,7 +346,7 @@ public class BucketBinaryTree implements Tree{
 				removeNodeFromLists(k1);	// <-- inutile 
 				removeNodeFromLists(k1.getLeft());
 				removeNodeFromLists(k1.getRight());
-				
+
 				k1.setSide(Side.RIGHT);
 				k1.getLeft().setSide(Side.RIGHT_LEFT);
 				k1.getRight().setSide(Side.RIGTH_RIGHT);
@@ -448,7 +448,7 @@ public class BucketBinaryTree implements Tree{
 		// changes in Sides
 		if ( k2.getParent() == null ) {
 			//k1 was the root
-			
+
 			/*
 			 * 		   k2(n)                  k1(n)
 			 * 		  /	 \                 /         \ 
@@ -460,7 +460,7 @@ public class BucketBinaryTree implements Tree{
 			//removeNodeFromLists(k2);	// <-- inutile 
 			removeNodeFromLists(k2.getLeft());
 			removeNodeFromLists(k2.getRight());
-			
+
 			k2.setSide(Side.NONE);
 			k2.getLeft().setSide(Side.LEFT);
 			k2.getRight().setSide(Side.RIGHT);
@@ -485,7 +485,7 @@ public class BucketBinaryTree implements Tree{
 				removeNodeFromLists(k2);
 				removeNodeFromLists(k2.getLeft());
 				removeNodeFromLists(k2.getRight());
-				
+
 				k2.setSide(Side.LEFT);
 				k2.getLeft().setSide(Side.LEFT_LEFT);
 				k2.getRight().setSide(Side.LEFT_RIGHT);
@@ -504,11 +504,11 @@ public class BucketBinaryTree implements Tree{
 				 *      /  \            	   /  \           /  \
 				 * (RL)B    C(RL)    	  (RL)C    A(RL) (RR)U   W(RR)
 				 */
-				
+
 				removeNodeFromLists(k2);
 				removeNodeFromLists(k2.getLeft());
 				removeNodeFromLists(k2.getRight());
-				
+
 				k2.setSide(Side.RIGHT);
 				k2.getLeft().setSide(Side.RIGHT_LEFT);
 				k2.getRight().setSide(Side.RIGTH_RIGHT);
@@ -535,22 +535,22 @@ public class BucketBinaryTree implements Tree{
 	}
 
 	private static void removeNodeFromLists(BucketNode node) {
-		
+
 		if ( node.getSide().equals(Side.LEFT_LEFT) ) {
-			
+
 			left_leftSideNodes.remove(node);
-		
+
 		} else if ( node.getSide().equals(Side.LEFT_RIGHT) ) {
-			
+
 			left_rightSideNodes.remove(node);
-		
-			
+
+
 		} else if ( node.getSide().equals(Side.RIGHT_LEFT) ) {
-			
+
 			right_leftSideNodes.remove(node);
-		
+
 		} else if ( node.getSide().equals(Side.RIGTH_RIGHT) ) {
-			
+
 			right_rightSideNodes.remove(node);
 		}
 	}
@@ -583,7 +583,7 @@ public class BucketBinaryTree implements Tree{
 		if ( node != null )  {
 
 			if ( ! node.getSide().equals(newSide) ) {
-				
+
 				removeNodeFromLists(node);
 				//Side oldSide = node.getSide(); 
 				node.setSide(newSide);
@@ -624,8 +624,8 @@ public class BucketBinaryTree implements Tree{
 
 					right_rightSideNodes.remove(node);
 				}
-				*/
-				
+				 */
+
 				changeSideToSubtree2(node.getRight(), newSide);
 				changeSideToSubtree2(node.getLeft(), newSide);
 			}
@@ -668,8 +668,8 @@ public class BucketBinaryTree implements Tree{
 		return rotateWithRightChild( k1 );
 	}
 
-	
-	
+
+
 	/*
 	 * nearest neighbor query
 	 */
@@ -755,13 +755,13 @@ public class BucketBinaryTree implements Tree{
 		}
 	}
 
-	
-	
-	
+
+
+
 	/*
 	 * random nearest neighbor query
 	 */
-	
+
 	public void randomNearestNeighbor(BucketNode v, int p, int k, Result result, String status) {
 
 		if ( !(status == null) ) {
@@ -865,14 +865,14 @@ public class BucketBinaryTree implements Tree{
 		return result;
 	}
 
-	
-	
-	
-	
+
+
+
+
 	public static void main( String [ ] args ){
 
-		int bucketSize 	= 30;
-		int maxNumPunti	= 8192;
+		int bucketSize 	= 5;
+		int maxNumPunti	= 16384;
 		int k			= 3;
 		int queryPoint  = 0;
 
@@ -885,6 +885,7 @@ public class BucketBinaryTree implements Tree{
 			for (int i = 0; i < numPunti; i++) {
 				//tree.insert(i);
 				tree.insert2(i);	
+				tree.buildListSide2();
 			}
 
 			/*
@@ -892,8 +893,8 @@ public class BucketBinaryTree implements Tree{
 					" LR: " + tree.left_rightSideNodes.size() + 
 					" RL: " + tree.right_leftSideNodes.size() + 
 					" RR: " + tree.right_rightSideNodes.size());
-			*/
-			
+			 */
+
 			System.out.println("n = " + numPunti);
 
 			double sommaPercRoot = 0, sommaPercNoRoot = 0;
@@ -905,11 +906,12 @@ public class BucketBinaryTree implements Tree{
 				//TestResult res = tree.testFSNSide(tree, queryPoint);
 				//TestResult res = tree.testFSNMinMaxSide(tree, queryPoint);
 
-				TestResult res = tree.testFSNMinMaxSide2(tree, queryPoint);	//insert2()
+				//TestResult res = tree.testFSNSide2(tree, queryPoint);			//insert2() + buildList
+				TestResult res = tree.testFSNMinMaxSide2(tree, queryPoint);	//insert2() + buildList
 
 				sommaPercNoRoot = sommaPercNoRoot + res.percNumNoRoot;
 				sommaPercRoot	= sommaPercRoot + res.percNumRoot;
-				
+
 				//System.out.println(res.percNumRoot + " --" + res.percNumNoRoot );
 				//System.out.println(sommaPercRoot + " --" + sommaPercNoRoot );
 			}
@@ -933,10 +935,52 @@ public class BucketBinaryTree implements Tree{
 		 */
 	}
 
-	
-	
-	
-	
+	public void buildListSide2() {
+
+		/*
+		 * questo metodo è necessario perchè ci sta un piccolo errore 
+		 * nella costruzione delle liste durante il caricamento dell'albero.
+		 * Manca sempre e solo un nodo dalle due liste right 
+		 */
+
+		left_leftSideNodes 		= new ArrayList<BucketNode>();
+		left_rightSideNodes 	= new ArrayList<BucketNode>();
+		right_leftSideNodes 	= new ArrayList<BucketNode>();
+		right_rightSideNodes 	= new ArrayList<BucketNode>();
+
+		if ( root.getLeft() != null ) {
+			addSubreeToList((BucketNode) root.getLeft().getLeft(),  left_leftSideNodes, Side.LEFT_LEFT);	
+			addSubreeToList((BucketNode) root.getLeft().getRight(), left_rightSideNodes, Side.LEFT_RIGHT);
+		}
+
+		if ( root.getRight() != null ) {
+			addSubreeToList((BucketNode) root.getRight().getLeft(), right_leftSideNodes, Side.RIGHT_LEFT);
+			addSubreeToList((BucketNode) root.getRight().getRight(), right_rightSideNodes, Side.RIGTH_RIGHT);	
+		}
+	}
+
+
+	private void addSubreeToList(BucketNode node,
+			List<BucketNode> list, Side newSide) {
+
+		if ( node != null ){
+
+			node.setSide(newSide);
+			list.add(node);
+
+			if ( node.getLeft() != null) {
+				addSubreeToList(node.getLeft(), list, newSide);
+			}
+
+			if ( node.getRight() != null) {
+				addSubreeToList(node.getRight(), list, newSide);
+			}
+		}
+	}
+
+
+
+
 	/*
 	 * finding starting node
 	 */
@@ -1076,8 +1120,8 @@ public class BucketBinaryTree implements Tree{
 	}
 
 
-	
-	
+
+
 
 	/*
 	 * test functions
@@ -1190,7 +1234,7 @@ public class BucketBinaryTree implements Tree{
 
 		TestResult r = new TestResult();
 		double numProve = 0;
-		
+
 		if ( queryPoint < root.getSplitValue() ) {
 			for ( BucketNode node : tree.leftSideNodes ) {
 				if ( ! node.isRoot() ) {
@@ -1203,7 +1247,7 @@ public class BucketBinaryTree implements Tree{
 					}	
 				}
 			}
-			
+
 		} else {
 			for ( BucketNode node : tree.rightSideNodes ) {
 				if ( ! node.isRoot() ) {
@@ -1217,9 +1261,77 @@ public class BucketBinaryTree implements Tree{
 				}
 			}
 		}
-		
+
 		double num1 = r.numRoot * 100;
 		double num2 = r.numNoRoot * 100;
+		r.percNumRoot   = (num1 / numProve);
+		r.percNumNoRoot = (num2 / numProve);
+
+		return r;
+	}
+
+	public TestResult testFSNSide2(BucketBinaryTree tree, int queryPoint) {
+
+		TestResult r = new TestResult();
+		double numProve = 0;
+
+		if ( queryPoint < root.getSplitValue() ) {
+			// go to left child 
+			if ( queryPoint < root.getLeft().getSplitValue() ) {
+				for ( BucketNode node : tree.left_leftSideNodes ) {
+
+					BucketNode start = tree.findStartingNode(queryPoint, node);
+					numProve++;
+					if ( start.isRoot() ) {
+						r.numRoot++;
+					} else {
+						r.numNoRoot++;
+					}	
+				}
+				
+			} else {
+				for ( BucketNode node : tree.left_rightSideNodes ) {
+					BucketNode start = tree.findStartingNode(queryPoint, node);
+					numProve++;
+					if ( start.isRoot() ) {
+						r.numRoot++;
+					} else {
+						r.numNoRoot++;
+					}	
+				}
+			}
+
+		} else {
+			// go to right child
+			if ( queryPoint < root.getRight().getSplitValue() ) {
+				for ( BucketNode node : tree.right_leftSideNodes ) {
+
+					BucketNode start = tree.findStartingNode(queryPoint, node);
+					numProve++;
+					if ( start.isRoot() ) {
+						r.numRoot++;
+					} else {
+						r.numNoRoot++;
+					}	
+				}	
+				
+			} else {
+				for ( BucketNode node : tree.right_rightSideNodes ) {
+
+					BucketNode start = tree.findStartingNode(queryPoint, node);
+					numProve++;
+					if ( start.isRoot() ) {
+						r.numRoot++;
+					} else {
+						r.numNoRoot++;
+					}	
+				}
+			}
+		}
+
+		double num1 = r.numRoot * 100;
+		double num2 = r.numNoRoot * 100;
+
 		r.percNumRoot   = (num1 / numProve);
 		r.percNumNoRoot = (num2 / numProve);
 
@@ -1230,76 +1342,71 @@ public class BucketBinaryTree implements Tree{
 
 		TestResult r = new TestResult();
 		double numProve = 0;
-		
+
 		if ( queryPoint < root.getSplitValue() ) {
 			// go to left child 
 			if ( queryPoint < root.getLeft().getSplitValue() ) {
+
+				//System.out.println("left-left");
+
 				for ( BucketNode node : tree.left_leftSideNodes ) {
-					if ( ! node.isRoot() 
-							&& !node.equals(root.getLeft()) 
-									&& !node.equals(root.getRight() ) ) {
-						
-						BucketNode start = tree.findStartingNodeMinMax(queryPoint, node);
-						numProve++;
-						if ( start.isRoot() ) {
-							r.numRoot++;
-						} else {
-							r.numNoRoot++;
-						}	
-					}
+					BucketNode start = tree.findStartingNodeMinMax(queryPoint, node);
+					numProve++;
+					if ( start.isRoot() ) {
+						r.numRoot++;
+					} else {
+						r.numNoRoot++;
+					}	
 				}
+
 			} else {
+
+				//System.out.println("left-right");
+
 				for ( BucketNode node : tree.left_rightSideNodes ) {
-					if ( ! node.isRoot() 
-							&& !node.equals(root.getLeft()) 
-									&& !node.equals(root.getRight() ) ) {
-					
-						BucketNode start = tree.findStartingNodeMinMax(queryPoint, node);
-						numProve++;
-						if ( start.isRoot() ) {
-							r.numRoot++;
-						} else {
-							r.numNoRoot++;
-						}	
-					}
+					BucketNode start = tree.findStartingNodeMinMax(queryPoint, node);
+					numProve++;
+					if ( start.isRoot() ) {
+						r.numRoot++;
+					} else {
+						r.numNoRoot++;
+					}	
 				}
 			}
-			
+
 		} else {
 			// go to right child
 			if ( queryPoint < root.getRight().getSplitValue() ) {
+
+				//System.out.println("right-left");
+
 				for ( BucketNode node : tree.right_leftSideNodes ) {
-					if ( ! node.isRoot() 
-							&& !node.equals(root.getLeft()) 
-									&& !node.equals(root.getRight() ) ) {
-					
-						BucketNode start = tree.findStartingNodeMinMax(queryPoint, node);
-						numProve++;
-						if ( start.isRoot() ) {
-							r.numRoot++;
-						} else {
-							r.numNoRoot++;
-						}	
-					}
+					BucketNode start = tree.findStartingNodeMinMax(queryPoint, node);
+					numProve++;
+					if ( start.isRoot() ) {
+						r.numRoot++;
+					} else {
+						r.numNoRoot++;
+					}	
 				}	
+
 			} else {
+
+				//System.out.println("right-right");
+
 				for ( BucketNode node : tree.right_rightSideNodes ) {
-					if ( ! node.isRoot() 
-							&& !node.equals(root.getLeft()) 
-									&& !node.equals(root.getRight() ) ) {
-					
-						BucketNode start = tree.findStartingNodeMinMax(queryPoint, node);
-						numProve++;
-						if ( start.isRoot() ) {
-							r.numRoot++;
-						} else {
-							r.numNoRoot++;
-						}	
-					}
+
+					BucketNode start = tree.findStartingNodeMinMax(queryPoint, node);
+					numProve++;
+					if ( start.isRoot() ) {
+						r.numRoot++;
+					} else {
+						r.numNoRoot++;
+					}	
 				}
 			}
 		}
-		
+
 		double num1 = r.numRoot * 100;
 		double num2 = r.numNoRoot * 100;
 

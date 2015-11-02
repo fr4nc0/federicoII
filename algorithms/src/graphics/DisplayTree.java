@@ -247,12 +247,13 @@ public class DisplayTree extends JPanel implements TreeSelectionListener {
 			private void drawTree() {
 
 				int bucketSize = 3;
-				int numPunti   = 1024;
+				int numPunti   = 64;
 				BucketBinaryTree tree = new BucketBinaryTree(bucketSize);
 
 				for (int i = 0; i < numPunti; i++) {
 					//tree.insert(i);
 					tree.insert2(i);
+					tree.buildListSide2();
 				}
 
 				/*
