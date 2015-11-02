@@ -669,6 +669,8 @@ public class BucketBinaryTree implements Tree{
 	}
 
 
+	
+	
 
 	/*
 	 * nearest neighbor query
@@ -871,112 +873,62 @@ public class BucketBinaryTree implements Tree{
 
 	public static void main( String [ ] args ){
 
-		int bucketSize 	= 5;
-		int maxNumPunti	= 16384;
+		int[] bucketSizes 	= {5, 10, 20, 30, 40};
+		
+		int minNumPunti	= 512;
+		int maxNumPunti	= 32768;
 		int k			= 3;
 		int queryPoint  = 0;
 
-		for ( int numPunti = 32; numPunti <= maxNumPunti; ){
+		
+		
+		for (int b = 0; b < bucketSizes.length; b++ ) {
+			
+			System.out.println("\n\nbucket size: " + bucketSizes [b]);
+			
+			for ( int numPunti = minNumPunti; numPunti <= maxNumPunti; ){
 
-			numPunti = numPunti * 2;
+				BucketBinaryTree tree = new BucketBinaryTree(bucketSizes [b]);
 
-			BucketBinaryTree tree = new BucketBinaryTree(bucketSize);
+				for (int i = 0; i < numPunti; i++) {
+					//tree.insert(i);
+					tree.insert2(i);	
+					tree.buildListSide2();
+				}
 
-			for (int i = 0; i < numPunti; i++) {
-				//tree.insert(i);
-				tree.insert2(i);	
-				tree.buildListSide2();
-			}
+				
+				System.out.println("\tn = " + numPunti);
 
-			/*
-			System.out.println("LL: " + tree.left_leftSideNodes.size() +
-					" LR: " + tree.left_rightSideNodes.size() + 
-					" RL: " + tree.right_leftSideNodes.size() + 
-					" RR: " + tree.right_rightSideNodes.size());
-			 */
+				double sommaPercRoot = 0, sommaPercNoRoot = 0;
 
-			System.out.println("n = " + numPunti);
+				for ( queryPoint = 0; queryPoint < numPunti; queryPoint++ ) {
 
-			double sommaPercRoot = 0, sommaPercNoRoot = 0;
+					//TestResult res = tree.testFSN(tree, queryPoint);
+					//TestResult res = tree.testFSNMinMax(tree, queryPoint);
+					//TestResult res = tree.testFSNSide(tree, queryPoint);
+					//TestResult res = tree.testFSNMinMaxSide(tree, queryPoint);
 
-			for ( queryPoint = 0; queryPoint < numPunti; queryPoint++ ) {
+					//TestResult res = tree.testFSNSide2(tree, queryPoint);			//insert2() + buildListSide2()
+					TestResult res = tree.testFSNMinMaxSide2(tree, queryPoint);		//insert2() + buildListSide2()
 
-				//TestResult res = tree.testFSN(tree, queryPoint);
-				//TestResult res = tree.testFSNMinMax(tree, queryPoint);
-				//TestResult res = tree.testFSNSide(tree, queryPoint);
-				//TestResult res = tree.testFSNMinMaxSide(tree, queryPoint);
+					sommaPercNoRoot = sommaPercNoRoot + res.percNumNoRoot;
+					sommaPercRoot	= sommaPercRoot + res.percNumRoot;
 
-				//TestResult res = tree.testFSNSide2(tree, queryPoint);			//insert2() + buildList
-				TestResult res = tree.testFSNMinMaxSide2(tree, queryPoint);	//insert2() + buildList
+				}
 
-				sommaPercNoRoot = sommaPercNoRoot + res.percNumNoRoot;
-				sommaPercRoot	= sommaPercRoot + res.percNumRoot;
+				double mediaPercRoot   = sommaPercRoot/numPunti;
+				double mediaPercNoRoot = sommaPercNoRoot/numPunti;
 
-				//System.out.println(res.percNumRoot + " --" + res.percNumNoRoot );
-				//System.out.println(sommaPercRoot + " --" + sommaPercNoRoot );
-			}
+				System.out.println("\t\t%Root: " + Math.round(mediaPercRoot)+ " %noRoot: " + Math.round(mediaPercNoRoot) + "\n");
 
-			double mediaPercRoot   = sommaPercRoot/numPunti;
-			double mediaPercNoRoot = sommaPercNoRoot/numPunti;
-
-			System.out.println("media%Root: " + Math.round(mediaPercRoot) 
-					+ " media%noRoot: " + Math.round(mediaPercNoRoot));
-
-		}
-
-
-		/*
-		Result result = tree.randomNearestQuery(queryPoint, k);
-		//Result result = tree.nearestQuery(queryPoint, k);
-		Integer[] points = result.getPoints();
-		for ( Integer i : points ) {
-			System.err.println(i);
-		}
-		 */
-	}
-
-	public void buildListSide2() {
-
-		/*
-		 * questo metodo è necessario perchè ci sta un piccolo errore 
-		 * nella costruzione delle liste durante il caricamento dell'albero.
-		 * Manca sempre e solo un nodo dalle due liste right 
-		 */
-
-		left_leftSideNodes 		= new ArrayList<BucketNode>();
-		left_rightSideNodes 	= new ArrayList<BucketNode>();
-		right_leftSideNodes 	= new ArrayList<BucketNode>();
-		right_rightSideNodes 	= new ArrayList<BucketNode>();
-
-		if ( root.getLeft() != null ) {
-			addSubreeToList((BucketNode) root.getLeft().getLeft(),  left_leftSideNodes, Side.LEFT_LEFT);	
-			addSubreeToList((BucketNode) root.getLeft().getRight(), left_rightSideNodes, Side.LEFT_RIGHT);
-		}
-
-		if ( root.getRight() != null ) {
-			addSubreeToList((BucketNode) root.getRight().getLeft(), right_leftSideNodes, Side.RIGHT_LEFT);
-			addSubreeToList((BucketNode) root.getRight().getRight(), right_rightSideNodes, Side.RIGTH_RIGHT);	
-		}
-	}
-
-
-	private void addSubreeToList(BucketNode node,
-			List<BucketNode> list, Side newSide) {
-
-		if ( node != null ){
-
-			node.setSide(newSide);
-			list.add(node);
-
-			if ( node.getLeft() != null) {
-				addSubreeToList(node.getLeft(), list, newSide);
-			}
-
-			if ( node.getRight() != null) {
-				addSubreeToList(node.getRight(), list, newSide);
+				numPunti = numPunti * 2;
 			}
 		}
 	}
+
+	
+	
+	
 
 
 
@@ -1119,10 +1071,52 @@ public class BucketBinaryTree implements Tree{
 		return randomNum;
 	}
 
+	public void buildListSide2() {
+
+		/*
+		 * questo metodo è necessario perchè ci sta un piccolo errore 
+		 * nella costruzione delle liste durante il caricamento dell'albero.
+		 * Manca sempre e solo un nodo dalle due liste right 
+		 */
+
+		left_leftSideNodes 		= new ArrayList<BucketNode>();
+		left_rightSideNodes 	= new ArrayList<BucketNode>();
+		right_leftSideNodes 	= new ArrayList<BucketNode>();
+		right_rightSideNodes 	= new ArrayList<BucketNode>();
+
+		if ( root.getLeft() != null ) {
+			addSubreeToList((BucketNode) root.getLeft().getLeft(),  left_leftSideNodes, Side.LEFT_LEFT);	
+			addSubreeToList((BucketNode) root.getLeft().getRight(), left_rightSideNodes, Side.LEFT_RIGHT);
+		}
+
+		if ( root.getRight() != null ) {
+			addSubreeToList((BucketNode) root.getRight().getLeft(), right_leftSideNodes, Side.RIGHT_LEFT);
+			addSubreeToList((BucketNode) root.getRight().getRight(), right_rightSideNodes, Side.RIGTH_RIGHT);	
+		}
+	}
+
+	private void addSubreeToList(BucketNode node,
+			List<BucketNode> list, Side newSide) {
+
+		if ( node != null ){
+
+			node.setSide(newSide);
+			list.add(node);
+
+			if ( node.getLeft() != null) {
+				addSubreeToList(node.getLeft(), list, newSide);
+			}
+
+			if ( node.getRight() != null) {
+				addSubreeToList(node.getRight(), list, newSide);
+			}
+		}
+	}
 
 
 
-
+	
+	
 	/*
 	 * test functions
 	 */
