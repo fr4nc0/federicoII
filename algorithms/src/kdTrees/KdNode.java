@@ -251,7 +251,8 @@ public class KdNode implements Node{
 
 	static public int selectSplitCoordinate(int dimensions, int height) {
 		
-		// Select coordinate based on height so that coordinates cycles through all valid values
+		// Select coordinate based on height so that coordinates cycles through 
+		// all valid values
 	    return height % dimensions;
 	}
 

@@ -876,7 +876,7 @@ public class BucketBinaryTree implements Tree{
 		int[] bucketSizes 	= {5, 10, 20, 30, 40};
 		
 		int minNumPunti	= 512;
-		int maxNumPunti	= 32768;
+		int maxNumPunti	= 1024;
 		int k			= 3;
 		int queryPoint  = 0;
 

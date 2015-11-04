@@ -80,7 +80,8 @@ public class KdTree implements Tree {
 
 	private KdNode load(Point[] points, int dept, int bucketSize, Side side) {
 
-		// Select axis based on depth so that axis cycles through all valid values: returns dept mod k;
+		// Select axis based on depth so that axis cycles through all valid values: 
+		// returns dept mod k;
 		int coord = KdNode.selectSplitCoordinate(points[0].getNumberCoords(), dept); 
 
 		if ( points.length <= bucketSize ) {
