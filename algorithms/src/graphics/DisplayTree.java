@@ -234,7 +234,7 @@ public class DisplayTree extends JPanel implements TreeSelectionListener {
 			public void run() {
 
 				//executeCorrectnessTests();
-				
+
 				//testStartingNodeKdTree();
 				//preliminaryTestRandomQueriesCorrectness();
 
@@ -247,33 +247,36 @@ public class DisplayTree extends JPanel implements TreeSelectionListener {
 			private void drawTree() {
 
 				int bucketSize = 3;
-				int numPunti   = 64;
+				long numPunti   = 1000000;
 				BucketBinaryTree tree = new BucketBinaryTree(bucketSize);
 
 				for (int i = 0; i < numPunti; i++) {
-					//tree.insert(i);
-					tree.insert2(i);
-					tree.buildListSide2();
+					tree.insert(i);
+					//tree.insert2(i);
+					printProgress(i, numPunti);
+
 				}
+
+				//tree.buildListSide2();
 
 				/*
 				System.out.println("All: " + tree.allNodes.size() + 
 						" L: " + tree.leftSideNodes.size() + 
 						" R: " + tree.rightSideNodes.size());
-				*/
-				
+				 */
+				/*
 				System.out.println("All: " + tree.allNodes.size() + 
 						" LL: " + tree.left_leftSideNodes.size() +
 						" LR: " + tree.left_rightSideNodes.size() + 
 						" RL: " + tree.right_leftSideNodes.size() + 
 						" RR: " + tree.right_rightSideNodes.size());
-				
+
 				System.out.println("All: " + tree.allNodes.size() + 
 						"\n LL: " + tree.left_leftSideNodes +
 						"\n LR: " + tree.left_rightSideNodes + 
 						"\n RL: " + tree.right_leftSideNodes + 
 						"\n RR: " + tree.right_rightSideNodes);
-				
+				 */
 				showTree(tree);
 
 				/*
@@ -286,6 +289,18 @@ public class DisplayTree extends JPanel implements TreeSelectionListener {
 					System.out.println(n);
 				}
 				 */
+			}
+
+			private void printProgress(int i, long numPunti) {
+
+				long val = i*100;
+				
+				if ( val == (10*numPunti) || val == (20*numPunti) || val == (30*numPunti) ||   
+					 val == (40*numPunti) || val == (50*numPunti) || val == (60*numPunti) ||
+					 val == (70*numPunti) || val == (80*numPunti) || val == (90*numPunti) ) {
+					 
+					System.out.println(i);
+				}	
 			}
 
 			private void testStartingNodeKdTree() {
@@ -397,30 +412,30 @@ public class DisplayTree extends JPanel implements TreeSelectionListener {
 									KdResult result = tree.nearestQuery(queryPoint, k);
 									Point[] sortedResults = getSortedArray(result);
 									System.out.println("OK " + result);
-									
+
 									// NO MinMax - NO Side
 									KdResult resultRandomNOMinMaxNOSide = 
 											tree.randomNearestQuery(queryPoint, k, false, false);
 									Point[] sortedResultNOMinMaxNOSide = 
 											getSortedArray(resultRandomNOMinMaxNOSide);
 									System.out.println("OK " + resultRandomNOMinMaxNOSide);
-									
-									
+
+
 									// MinMax - NO Side 
 									KdResult resultRandomMinMaxNOSide = 
 											tree.randomNearestQuery(queryPoint, k, true, false);
 									Point[] sortedResultMinMaxNOSide = 
 											getSortedArray(resultRandomMinMaxNOSide);
 									System.out.println("OK" + resultRandomMinMaxNOSide);
-									
-									
+
+
 									// NO MinMax - Side
 									KdResult resultRandomNOMinMaxSide = 
 											tree.randomNearestQuery(queryPoint, k, false, true);
 									Point[] sortedResultNOMinMaxSide = 
 											getSortedArray(resultRandomNOMinMaxSide);
 									System.out.println("OK" + resultRandomNOMinMaxSide);
-									
+
 									// MinMax - Side
 									KdResult resultRandomMinMaxSide = 
 											tree.randomNearestQuery(queryPoint, k, true, true);
@@ -454,13 +469,13 @@ public class DisplayTree extends JPanel implements TreeSelectionListener {
 				if ( a1.length != a2.length ) {
 					return false;
 				}
-				
+
 				for ( int i = 0; i < a1.length; i++) {
 					if ( ! a1[i].equals(a2[i]) ) {
 						return false;
 					}
 				}
-				
+
 				return true;
 			}
 
