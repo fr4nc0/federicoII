@@ -669,22 +669,11 @@ public class BucketBinaryTree implements Tree{
 	}
 
 
-	
-	
+
 
 	/*
 	 * nearest neighbor query
 	 */
-	private void nearestNeighbor(BucketNode v, int p, int k, Result result, String status) {
-
-		if ( !(status == null) ) {
-			v.setStatus(status);
-		}
-
-		//System.out.println("nearestNeighbor: " + v + " v.status:" + v.getStatus() + " status:" + status);
-
-		NN(v, p, k, result);
-	}
 
 	public Result nearestQuery(int queryPoint, int k) {
 
@@ -692,6 +681,15 @@ public class BucketBinaryTree implements Tree{
 		nearestNeighbor(root, queryPoint, k, result, none);
 
 		return result;
+	}
+
+	private void nearestNeighbor(BucketNode v, int p, int k, Result result, String status) {
+
+		if ( !(status == null) ) {
+			v.setStatus(status);
+		}
+
+		NN(v, p, k, result);
 	}
 
 	private void NN(BucketNode v, int p, int k, Result result) {
@@ -703,22 +701,26 @@ public class BucketBinaryTree implements Tree{
 
 		} else {
 
-			if ( v.getStatus().equals(none) && !(v.isLeaf()) ) {
+			if ( v.getStatus().equals(none) ) {
 				if ( p < v.getSplitValue()) {
 					v.setStatus(leftVisited); 
+
 					nearestNeighbor (v.getLeft(), p, k, result, none);
+
 				} else {
+
 					v.setStatus(rightVisited); 
 					nearestNeighbor (v.getRight(), p, k, result, none);
 				}
 			} 
+
 			/*
 			 * potrebbe entrare in rightVisited oppure in leftVisited dopo essere uscito dall'if precedente
 			 */
 			if ( v.getStatus().equals(rightVisited) ) {
 
 				if ( ! (v.getLeft() == null) && secondChildMustBeVisited(v, p, result) ) {
-					//v.setStatus(allVisited); 
+
 					nearestNeighbor (v.getLeft(), p, k, result, none);
 				}
 			} 
@@ -726,13 +728,12 @@ public class BucketBinaryTree implements Tree{
 			if ( v.getStatus().equals(leftVisited) ) {
 
 				if ( ! (v.getRight() == null) && secondChildMustBeVisited(v, p, result) ) {
-					//v.setStatus(allVisited); 
+
 					nearestNeighbor (v.getRight(), p, k, result, none);
 				}
 			}
 		}
 
-		// l'elaborazione del nodo corrente è finita
 		v.setStatus(null);
 	}
 
@@ -761,89 +762,101 @@ public class BucketBinaryTree implements Tree{
 
 
 	/*
-	 * random nearest neighbor query
+	 * nearest neighbor query with ending node
 	 */
 
-	public void randomNearestNeighbor(BucketNode v, int p, int k, Result result, String status) {
+	public Result nearestQueryWithEndingNode(int queryPoint, int k) {
+
+		Result result = new Result(queryPoint, k);
+		result.setEndingNode(root.getSplitValue());
+
+		nearestNeighborWithEndingNode(root, queryPoint, k, result, none);
+
+		return result;
+	}
+
+	private void nearestNeighborWithEndingNode(BucketNode v, int p, int k, Result result, String status) {
 
 		if ( !(status == null) ) {
 			v.setStatus(status);
 		}
 
-		//System.out.println("randomNearestNeighbor: " + v + " v.status:" + v.getStatus() + " status:" + status);
-
-		randomNN(v, p, k, result);
+		NN_WithEndingNode(v, p, k, result);
 	}
 
-	private void randomNN(BucketNode v, int p, int k, Result result) {
-
-		//System.out.println(v + " " + v.getStatus());
+	private void NN_WithEndingNode(BucketNode v, int p, int k, Result result) {
 
 		if ( v.isLeaf() ) {
 
 			result.add (v.getBucket());
-
-			if ( mustBeSetParentStatus(v) )  {
-
-				randomNearestNeighbor(v.getParent(), p, k, result, null);
-			}
 			//return; 
 
 		} else {
 
-			if ( v.getStatus().equals(none) && !(v.isLeaf()) ) {
+			if ( v.getStatus().equals(none) ) {
 				if ( p < v.getSplitValue()) {
+
 					v.setStatus(leftVisited); 
-					randomNearestNeighbor (v.getLeft(), p, k, result, none);
+					nearestNeighborWithEndingNode (v.getLeft(), p, k, result, none);
+
 				} else {
+
 					v.setStatus(rightVisited); 
-					randomNearestNeighbor (v.getRight(), p, k, result, none);
+					nearestNeighborWithEndingNode (v.getRight(), p, k, result, none);
 				}
 			} 
-			/*
-			 * potrebbe entrare in rightVisited oppure in leftVisited dopo essere uscito dall'if precedente
-			 */
-			if ( v.getStatus().equals(rightVisited) ) {
 
-				if ( ! (v.getLeft() == null) && secondChildMustBeVisited(v, p, result) ) {
-					randomNearestNeighbor (v.getLeft(), p, k, result, none);
+			if ( ! (result.isUpFromLeft() && result.isUpFromRight()) ) {
+
+				/*
+				 * potrebbe entrare in rightVisited oppure in leftVisited dopo essere uscito dall'if precedente
+				 */
+				if ( v.getStatus().equals(rightVisited) ) {
+
+					if ( ! (v.getLeft() == null) && secondChildMustBeVisited(v, p, result) ) {
+
+						nearestNeighborWithEndingNode (v.getLeft(), p, k, result, none);
+
+					} else {
+
+						result.setUpFromLeft(true);
+					}
 				} 
 
-				// do the following even if the left child is not visited 
-				if ( mustBeSetParentStatus(v) )  {
+				if ( v.getStatus().equals(leftVisited) ) {
 
-					randomNearestNeighbor(v.getParent(), p, k, result, null);
-				}
-			} 
+					if ( ! (v.getRight() == null) && secondChildMustBeVisited(v, p, result) ) {
 
-			if ( v.getStatus().equals(leftVisited) ) {
+						nearestNeighborWithEndingNode (v.getRight(), p, k, result, none);
 
-				if ( ! (v.getRight() == null) && secondChildMustBeVisited(v, p, result) ) {
+					} else {
 
-					randomNearestNeighbor (v.getRight(), p, k, result, none);
+						result.setUpFromRight(true);
+					}
 				}
 
-				// do the following even if the right child is not visited 
-				if ( mustBeSetParentStatus(v) )  {
+			} else {
 
-					randomNearestNeighbor(v.getParent(), p, k, result, null);
+				if ( result.getEndingNode().equals(root.getSplitValue()) ) {
+					result.setEndingNode(v.getSplitValue());
 				}
 			}
 		}
+
 		v.setStatus(null);
 	}
 
-	public Result randomNearestQuery(int queryPoint, int k) {
+
+
+
+	/*
+	 * random nearest neighbor query without ending node
+	 */
+
+	public Result randomNearestQueryWithoutEndingNode(int queryPoint, int k) {
 
 		int randomNodeIndex = 0;
 		BucketNode randomNode = null;
-
-		// no side
-		//randomNodeIndex = randInt( 0, (allNodes.size() - 1) );
-		//randomNode = allNodes.get(randomNodeIndex);
-		//while (randomNode.isRoot()) {
-		//	randomNode = allNodes.get(randInt(0, allNodes.size()));
-		//}
 
 		// side
 		if ( queryPoint < root.getSplitValue() ) {
@@ -856,15 +869,239 @@ public class BucketBinaryTree implements Tree{
 			randomNodeIndex = randInt( 0, (rightSideNodes.size() - 1) );
 			randomNode = rightSideNodes.get(randomNodeIndex);
 		}
-		//System.out.println(randomNodeIndex);
-		//System.out.println("ramdom: " + randomNode);
 
 		BucketNode startNode = findStartingNode(queryPoint, randomNode);
-		//System.out.println("start: " + startNode);
+
 		Result result = new Result(queryPoint, k);
+		randomNearestNeighborWithoutEndingNode(startNode, queryPoint, k, result, none);
+
+		return result;
+	}
+
+	private void randomNearestNeighborWithoutEndingNode(BucketNode v, int p, int k, Result result, String status) {
+
+		if ( !(status == null) ) {
+			v.setStatus(status);
+		}
+
+		randomNN_withoutEndingNode(v, p, k, result);
+	}
+
+	private void randomNN_withoutEndingNode(BucketNode v, int p, int k, Result result) {
+
+		if ( v.isLeaf() ) {
+
+			result.add (v.getBucket());
+
+			if ( mustBeSetParentStatus(v) )  {
+
+				randomNearestNeighborWithoutEndingNode(v.getParent(), p, k, result, null);
+			}
+
+		} else {
+
+			if ( v.getStatus().equals(none) ) {
+				if ( p < v.getSplitValue()) {
+
+					v.setStatus(leftVisited); 
+					randomNearestNeighborWithoutEndingNode (v.getLeft(), p, k, result, none);
+
+				} else {
+
+					v.setStatus(rightVisited); 
+					randomNearestNeighborWithoutEndingNode (v.getRight(), p, k, result, none);
+				}
+			} 
+			/*
+			 * potrebbe entrare in rightVisited oppure in leftVisited dopo essere uscito dall'if precedente
+			 */
+			if ( v.getStatus().equals(rightVisited) ) {
+
+				if ( ! (v.getLeft() == null) && secondChildMustBeVisited(v, p, result) ) {
+
+					randomNearestNeighborWithoutEndingNode (v.getLeft(), p, k, result, none);
+				} 
+
+				// do the following even if the left child is not visited 
+				if ( mustBeSetParentStatus(v) )  {
+
+					randomNearestNeighborWithoutEndingNode(v.getParent(), p, k, result, null);
+				}
+			} 
+
+			if ( v.getStatus().equals(leftVisited) ) {
+
+				if ( ! (v.getRight() == null) && secondChildMustBeVisited(v, p, result) ) {
+
+					randomNearestNeighborWithoutEndingNode (v.getRight(), p, k, result, none);
+				}
+
+				// do the following even if the right child is not visited 
+				if ( mustBeSetParentStatus(v) )  {
+
+					randomNearestNeighborWithoutEndingNode(v.getParent(), p, k, result, null);
+				}
+			}
+		}
+		v.setStatus(null);
+	}
+
+
+
+
+	/*
+	 * random nearest neighbor query with ending node
+	 */
+
+	public Result randomNearestQuery(int queryPoint, int k) {
+
+		int randomNodeIndex = 0;
+		BucketNode randomNode = null;
+
+		// side
+		if ( queryPoint < root.getSplitValue() ) {
+			// choose a node in left subtree
+			randomNodeIndex = randInt( 0, (leftSideNodes.size() - 1) );
+			randomNode = leftSideNodes.get(randomNodeIndex);
+
+		} else {
+			// choose a node in right subtree
+			randomNodeIndex = randInt( 0, (rightSideNodes.size() - 1) );
+			randomNode = rightSideNodes.get(randomNodeIndex);
+		}
+
+		BucketNode startNode = findStartingNode(queryPoint, randomNode);
+
+		Result result = new Result(queryPoint, k);
+		result.setEndingNode(root.getSplitValue());
+
+		System.out.println("random node: " + randomNode);
+		System.out.println("starting node: " + startNode);
+		System.out.println("end node: " + result.getEndingNode());
+		
 		randomNearestNeighbor(startNode, queryPoint, k, result, none);
 
 		return result;
+	}
+
+	private void randomNearestNeighbor(BucketNode v, int p, int k, Result result, String status) {
+
+		if ( !(status == null) ) {
+			v.setStatus(status);
+		}
+
+		randomNN(v, p, k, result);
+	}
+
+	public Result randomNearestQueryImposeStartingNode(int queryPoint, int k, int splitValue) {
+
+		BucketNode startNode = null;
+
+		for ( BucketNode n : allNodes) {
+			if ( n.getSplitValue() == splitValue ) {
+				if ( ! n.isLeaf()) {
+					startNode = n;
+					break;
+				}
+			}
+		}
+		
+		Result result = new Result(queryPoint, k);
+		result.setEndingNode(root.getSplitValue());
+
+		System.out.println("starting node: " + startNode);
+		System.out.println("end node: " + result.getEndingNode());
+		
+		randomNearestNeighbor(startNode, queryPoint, k, result, none);
+
+		return result;
+	}
+
+	private void randomNN(BucketNode v, int p, int k, Result result) {
+
+		System.out.println(v + " result:" + result + 
+				" upLeft: " + result.isUpFromLeft() + 
+				" upRight: " + result.isUpFromRight());
+		
+		if ( v.isLeaf() ) {
+
+			result.add (v.getBucket());
+
+			if ( mustBeSetParentStatus(v) )  {
+
+				randomNearestNeighbor(v.getParent(), p, k, result, null);
+			}
+
+		} else {
+
+			if ( v.getStatus().equals(none) ) {
+				if ( p < v.getSplitValue()) {
+
+					v.setStatus(leftVisited); 
+					randomNearestNeighbor (v.getLeft(), p, k, result, none);
+
+				} else {
+
+					v.setStatus(rightVisited); 
+					randomNearestNeighbor (v.getRight(), p, k, result, none);
+				}
+			} 
+
+			if ( ! (result.isUpFromLeft() && result.isUpFromRight()) ) {
+				
+				System.out.println(v + " condition FALSE result:" + result + 
+						" upLeft: " + result.isUpFromLeft() + 
+						" upRight: " + result.isUpFromRight());
+				
+				/*
+				 * potrebbe entrare in rightVisited oppure in leftVisited dopo essere uscito dall'if precedente
+				 */
+				if ( v.getStatus().equals(rightVisited) ) {
+
+					if ( ! (v.getLeft() == null) && secondChildMustBeVisited(v, p, result) ) {
+
+						randomNearestNeighbor (v.getLeft(), p, k, result, none);
+						
+					} else {
+						
+						result.setUpFromLeft(true);
+					}
+					
+					if ( mustBeSetParentStatus(v) )  {
+
+						randomNearestNeighbor(v.getParent(), p, k, result, null);
+					}
+									} 
+
+				if ( v.getStatus().equals(leftVisited) ) {
+
+					if ( ! (v.getRight() == null) && secondChildMustBeVisited(v, p, result) ) {
+
+						randomNearestNeighbor (v.getRight(), p, k, result, none);
+											
+					} else {
+						
+						result.setUpFromRight(true);
+					}
+					
+					if ( mustBeSetParentStatus(v) )  {
+
+						randomNearestNeighbor(v.getParent(), p, k, result, null);
+					}
+				}
+				
+			} else {
+				
+				System.out.println(v + " condition TRUE result:" + result + 
+						" upLeft: " + result.isUpFromLeft() + 
+						" upRight: " + result.isUpFromRight());
+				
+				if ( result.getEndingNode().equals(root.getSplitValue()) ) {
+					result.setEndingNode(v.getSplitValue());
+				}
+			}
+		}
+		v.setStatus(null);
 	}
 
 
@@ -873,62 +1110,22 @@ public class BucketBinaryTree implements Tree{
 
 	public static void main( String [ ] args ){
 
-		int[] bucketSizes 	= {5, 10, 20, 30, 40};
-		
-		int minNumPunti	= 512;
-		int maxNumPunti	= 1024;
-		int k			= 3;
-		int queryPoint  = 0;
+		//executeFindingStartingNodeTests();
+		//executeFindindEndingNodeTests();
 
-		
-		
-		for (int b = 0; b < bucketSizes.length; b++ ) {
-			
-			System.out.println("\n\nbucket size: " + bucketSizes [b]);
-			
-			for ( int numPunti = minNumPunti; numPunti <= maxNumPunti; ){
-
-				BucketBinaryTree tree = new BucketBinaryTree(bucketSizes [b]);
-
-				for (int i = 0; i < numPunti; i++) {
-					//tree.insert(i);
-					tree.insert2(i);	
-					tree.buildListSide2();
-				}
-
-				
-				System.out.println("\tn = " + numPunti);
-
-				double sommaPercRoot = 0, sommaPercNoRoot = 0;
-
-				for ( queryPoint = 0; queryPoint < numPunti; queryPoint++ ) {
-
-					//TestResult res = tree.testFSN(tree, queryPoint);
-					//TestResult res = tree.testFSNMinMax(tree, queryPoint);
-					//TestResult res = tree.testFSNSide(tree, queryPoint);
-					//TestResult res = tree.testFSNMinMaxSide(tree, queryPoint);
-
-					//TestResult res = tree.testFSNSide2(tree, queryPoint);			//insert2() + buildListSide2()
-					TestResult res = tree.testFSNMinMaxSide2(tree, queryPoint);		//insert2() + buildListSide2()
-
-					sommaPercNoRoot = sommaPercNoRoot + res.percNumNoRoot;
-					sommaPercRoot	= sommaPercRoot + res.percNumRoot;
-
-				}
-
-				double mediaPercRoot   = sommaPercRoot/numPunti;
-				double mediaPercNoRoot = sommaPercNoRoot/numPunti;
-
-				System.out.println("\t\t%Root: " + Math.round(mediaPercRoot)+ " %noRoot: " + Math.round(mediaPercNoRoot) + "\n");
-
-				numPunti = numPunti * 2;
-			}
+		BucketBinaryTree tree = new BucketBinaryTree(2);
+		for (int i = 0; i < 256; i++) {
+			tree.insert(i);
 		}
+		int queryPoint = 5;
+		int k = 3;
+		Result result = tree.randomNearestQuery(queryPoint, k);
+		System.out.println(result);
 	}
 
-	
-	
-	
+
+
+
 
 
 
@@ -936,6 +1133,7 @@ public class BucketBinaryTree implements Tree{
 	/*
 	 * finding starting node
 	 */
+
 	public BucketNode findStartingNode(int p, BucketNode n) {
 
 		if (n.isRoot()) {
@@ -1115,11 +1313,139 @@ public class BucketBinaryTree implements Tree{
 
 
 
-	
-	
+
 	/*
-	 * test functions
+	 * test functions for ending node
 	 */
+	private static void executeFindindEndingNodeTests() {
+
+		/*
+		 * al variare della dimensione del bucket
+		 * al variare del numero di punti (da minNumPunti a maxNumPunti) 
+		 * 
+		 * calcola le percentuali:
+		 * per ogni punto 
+		 * 		esegue la nearest query con k che varia da kMin a kMax  
+		 */
+
+		int[] bucketSizes 			= {5, 10, 20, 30, 40};
+		int minNumPunti				= 512;
+		int maxNumPunti				= 1024;	//8.192, 16.384, 32.768
+		int kMin						= 3;
+		int queryPoint  			= 0;
+		int kMax					= 100;
+		double numProve				= 0;
+		double endingNodeRoot 		= 0;
+		double endingNodeNoRoot 	= 0;
+
+		for (int b = 0; b < bucketSizes.length; b++ ) {
+
+			System.out.println("\n\nbucket size: " + bucketSizes [b]);
+
+			for ( int numPunti = minNumPunti; numPunti <= maxNumPunti; ){
+
+				BucketBinaryTree tree = new BucketBinaryTree(bucketSizes [b]);
+
+				for (int i = 0; i < numPunti; i++) {
+					tree.insert(i);
+				}
+
+				BucketNode root = (BucketNode) tree.getRoot();
+
+				System.out.println("\tn = " + numPunti + " root: " + root.getSplitValue());
+
+				for ( queryPoint = 0; queryPoint < numPunti; queryPoint++ ) {
+
+					for ( int k = kMin; k < kMax; k++ ) {
+						numProve++;
+
+						Result result = tree.nearestQueryWithEndingNode(queryPoint, k);
+
+						if ( result.getEndingNode().equals(root.getSplitValue()) ) {
+							endingNodeRoot++;
+						} else {
+							endingNodeNoRoot++;
+						}
+						//System.out.println(result.getEndingNode());
+					}
+				}
+
+				double mediaPercEndingRoot   = (endingNodeRoot/numProve) * 100;
+				double mediaPercEndingNoRoot = (endingNodeNoRoot/numProve) * 100;
+				System.out.println("\t\t%ending-root: " + Math.round(mediaPercEndingRoot) + " %ending-noRoot: " + Math.round(mediaPercEndingNoRoot) + "\n");
+
+				numPunti = numPunti * 2;
+			}
+		}
+	}
+
+
+
+
+	/*
+	 * test functions for starting node
+	 */
+
+	private static void executeFindingStartingNodeTests() {
+
+		/*
+		 * al variare della dimensione del bucket
+		 * al variare del numero di punti (da minNumPunti a maxNumPunti) 
+		 * 
+		 * calcola le percentuali:
+		 * per ogni punto 
+		 * 		per ogni nodo 
+		 * 			cerca lo starting node
+		 */
+
+		int[] bucketSizes 			= {5, 10, 20, 30, 40};
+		int minNumPunti				= 512;
+		int maxNumPunti				= 1024;	//8.192, 16.384, 32.768
+		int queryPoint  			= 0;
+
+		for (int b = 0; b < bucketSizes.length; b++ ) {
+
+			System.out.println("\n\nbucket size: " + bucketSizes [b]);
+
+			for ( int numPunti = minNumPunti; numPunti <= maxNumPunti; ){
+
+				BucketBinaryTree tree = new BucketBinaryTree(bucketSizes [b]);
+
+				for (int i = 0; i < numPunti; i++) {
+					tree.insert(i);
+					//tree.insert2(i);	// da usare per i test SIDE2
+				}
+
+				//tree.buildListSide2();	// da usare per i test SIDE2
+
+				BucketNode root = (BucketNode) tree.getRoot();
+				System.out.println("\tn = " + numPunti + " root: " + root.getSplitValue());
+
+				double sommaPercRoot = 0, sommaPercNoRoot = 0;
+
+				for ( queryPoint = 0; queryPoint < numPunti; queryPoint++ ) {
+
+					//TestResult res = tree.testFSN(tree, queryPoint);
+					//TestResult res = tree.testFSNMinMax(tree, queryPoint);
+					//TestResult res = tree.testFSNSide(tree, queryPoint);
+					TestResult res = tree.testFSNMinMaxSide(tree, queryPoint);
+
+					//TestResult res = tree.testFSNSide2(tree, queryPoint);			//insert2() + buildListSide2()
+					//TestResult res = tree.testFSNMinMaxSide2(tree, queryPoint);		//insert2() + buildListSide2()
+
+					sommaPercNoRoot = sommaPercNoRoot + res.percNumNoRoot;
+					sommaPercRoot	= sommaPercRoot + res.percNumRoot;
+				}
+
+				double mediaPercRoot   = sommaPercRoot/numPunti;
+				double mediaPercNoRoot = sommaPercNoRoot/numPunti;
+				System.out.println("\t\t%Root: " + Math.round(mediaPercRoot)+ " %noRoot: " + Math.round(mediaPercNoRoot) + "\n");
+
+				numPunti = numPunti * 2;
+			}
+		}
+	}
+
 	public TestResult testFSN(BucketBinaryTree tree, int queryPoint) {
 
 		TestResult r = new TestResult();
@@ -1282,7 +1608,7 @@ public class BucketBinaryTree implements Tree{
 						r.numNoRoot++;
 					}	
 				}
-				
+
 			} else {
 				for ( BucketNode node : tree.left_rightSideNodes ) {
 					BucketNode start = tree.findStartingNode(queryPoint, node);
@@ -1308,7 +1634,7 @@ public class BucketBinaryTree implements Tree{
 						r.numNoRoot++;
 					}	
 				}	
-				
+
 			} else {
 				for ( BucketNode node : tree.right_rightSideNodes ) {
 

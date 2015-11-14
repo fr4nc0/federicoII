@@ -4,8 +4,11 @@ import java.util.PriorityQueue;
 
 public class Result {
 
-	private int limit;
-	private PriorityQueue<Integer> queue;
+	private int 					limit;
+	private PriorityQueue<Integer> 	queue;
+	private boolean 				upFromLeft;
+	private boolean 				upFromRight;
+	private Integer					endingNode;
 
 	
 	@Override
@@ -15,9 +18,12 @@ public class Result {
 
 	public Result(int queryPoint, int limit) {
 
-		this.limit = limit;
+		this.limit 					= limit;
 		ResultComparator comparator = new ResultComparator(queryPoint);
 		this.queue = new PriorityQueue<Integer>(1, comparator);
+		this.upFromLeft				= false;
+		this.upFromRight 			= false;
+		this.endingNode				= null;
 	}
 	
 	public void add (int[] values) {
@@ -51,4 +57,31 @@ public class Result {
 			return false;
 		}
 	}
+
+	public boolean isUpFromLeft() {
+		return upFromLeft;
+	}
+
+	public void setUpFromLeft(boolean upFromLeft) {
+		this.upFromLeft = upFromLeft;
+	}
+
+	public boolean isUpFromRight() {
+		return upFromRight;
+	}
+
+	public void setUpFromRight(boolean upFromRight) {
+		this.upFromRight = upFromRight;
+	}
+
+	public Integer getEndingNode() {
+		return endingNode;
+	}
+
+	public void setEndingNode(Integer endingNode) {
+		this.endingNode = endingNode;
+	}
+	
+	
+	
 }

@@ -9,6 +9,10 @@ import org.junit.Test;
 
 public class JunitTest_NearestQuery {
 
+	/*
+	 * these tests check the correctness of the 'classic' nearest neighbor implementation 
+	 */
+	
 	@Test
 	public void test1() {
 		

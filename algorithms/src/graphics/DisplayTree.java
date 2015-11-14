@@ -228,6 +228,8 @@ public class DisplayTree extends JPanel implements TreeSelectionListener {
 		frame.setVisible(true);
 	}
 
+	
+	
 	public static void main(String[] args) {
 
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -238,22 +240,51 @@ public class DisplayTree extends JPanel implements TreeSelectionListener {
 				//testStartingNodeKdTree();
 				//preliminaryTestRandomQueriesCorrectness();
 
-				drawTree();
+				exampleTest();
+				
+				//drawTree();
+				
 				//executeTests2();
 				//drawTree();
 				//executeTests();
 			}
 
+			private void exampleTest() {
+
+				/*
+				----------- num. punti:32 q:7 bucket size: 2 ----------
+				random node: 6 null
+				starting node: 6 null
+				end node: 16
+				[8, 7, 6]
+				[5, 7, 6]
+				*/
+				int numPunti 	= 32;
+				int queryPoint 	= 2;
+				int bucketSize 	= 3;
+				int k 			= 3;
+				//int splitValueStartingNode = 6;
+				
+				BucketBinaryTree tree = new BucketBinaryTree(bucketSize);
+				for (int i = 0; i < numPunti; i++) {
+					tree.insert(i);
+				}
+				System.err.println("queryPoint: " + queryPoint + " k: " + k);
+				Result result = tree.randomNearestQuery(queryPoint, k);
+				System.out.println(result);
+				showTree(tree);
+			}
+
 			private void drawTree() {
 
-				int bucketSize = 3;
-				long numPunti   = 1000000;
+				int bucketSize = 2;
+				long numPunti   = 2048;
 				BucketBinaryTree tree = new BucketBinaryTree(bucketSize);
 
 				for (int i = 0; i < numPunti; i++) {
 					tree.insert(i);
 					//tree.insert2(i);
-					printProgress(i, numPunti);
+					//printProgress(i, numPunti);
 
 				}
 
@@ -279,6 +310,12 @@ public class DisplayTree extends JPanel implements TreeSelectionListener {
 				 */
 				showTree(tree);
 
+				int queryPoint = 5;
+				int k = 3;
+				Result result = tree.nearestQueryWithEndingNode(queryPoint, k);
+				System.out.println(result);
+				System.out.println(result.getEndingNode());
+				
 				/*
 				System.out.println("Right nodes");
 				for (BucketNode n : tree.rightSideNodes) {

@@ -87,9 +87,9 @@ public class BucketNode implements Node {
 	@Override
 	public String toString() {
 		if (this.isLeaf()) {
-			return "bucket=" + getBucketAsString() + " " + status + side;
+			return "bucket=" + getBucketAsString() + " " + status;
 		} else {
-			return String.valueOf(splitValue)  + " " + status + side;	
+			return String.valueOf(splitValue)  + " " + status;	
 		}
 
 	}

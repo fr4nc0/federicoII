@@ -8,13 +8,23 @@ import org.junit.Test;
 
 public class JunitTest_RandomNeighborNearest {
 
+	/*
+	 * these tests compare the results of the 'classic' (nearestQuery)
+	 * 	vs. 'classic' nearest neighbor queries with ending node (nearestQueryWithEndingNode)
+	 *  vs. 'random' nearest neighbor queries without ending node (randomNearestQueryWithoutEndingNode)
+	 *  vs. 'random' nearest neighbor queries with ending node (randomNearestQuery)
+	 */
+	
 	@Test
 	public void test() {
-		int bucketSize = 0;
-		int numPunti   = 0;
 		
-		for ( bucketSize = 3; bucketSize < 4; bucketSize ++) {
-			for ( numPunti = 512; numPunti < 1024; numPunti++ ) {
+		int bucketSizeMin = 2;
+		int bucketSizeMax = 4;
+		int numPuntiMin   = 512;
+		int numPuntiMax   = 2048;
+		
+		for ( int bucketSize = bucketSizeMin; bucketSize < bucketSizeMax; bucketSize ++) {
+			for ( int numPunti = numPuntiMin; numPunti < numPuntiMax; numPunti++ ) {
 
 				BucketBinaryTree tree = new BucketBinaryTree(bucketSize);
 
@@ -22,17 +32,25 @@ public class JunitTest_RandomNeighborNearest {
 					tree.insert(i);	
 				}
 
-				int k = 3;
-				int queryPoint   = 0;
+				int k = 5;
 				
-				for ( queryPoint = 0; queryPoint < numPunti; queryPoint++) {
+				for ( int queryPoint = 0; queryPoint < numPunti; queryPoint++) {
 
+					//System.err.println("----------- num. punti:" + numPunti + " q:" + queryPoint + " bucket size: " + bucketSize +" ----------");
+					
 					Result result = tree.nearestQuery(queryPoint, k);
-					Result result2 = tree.randomNearestQuery(queryPoint, k);
+					//Result result2 = tree.nearestQueryWithEndingNode(queryPoint, k);
+					//Result result2 = tree.randomNearestQuery(queryPoint, k);
+					Result result2 = tree.randomNearestQueryWithoutEndingNode(queryPoint, k);
+					
 					Integer[] tmp  = result.getPoints();
 					Integer[] tmp2 = result2.getPoints();
 					Arrays.sort(tmp);
 					Arrays.sort(tmp2);
+					
+					//System.out.println(result);
+					//System.out.println(result2);
+					
 					assertArrayEquals(tmp, tmp2);
 				}
 			}					
