@@ -10,7 +10,7 @@ import mpi.MPI;
 import mpi.Request;
 import mpi.Status;
 
-public class MpjTree {
+public class MpjTreeSkeleton {
 
 	private enum Direction{
 		send,
