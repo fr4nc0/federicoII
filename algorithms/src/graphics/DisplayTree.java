@@ -15,12 +15,14 @@ import javax.swing.tree.TreeSelectionModel;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 
+import tree.BinaryTree;
+import tree.Distance;
+import tree.IntegerDistance;
+import tree.Node;
+import tree.Result;
+import tree.TestResult;
 import avlTrees.AvlNode;
 import avlTrees.AvlTree;
-import binaryTrees.BucketBinaryTree;
-import binaryTrees.BucketNode;
-import binaryTrees.Result;
-import binaryTrees.TestResult;
 
 import java.net.URL;
 import java.util.Arrays;
@@ -50,7 +52,7 @@ public class DisplayTree extends JPanel implements TreeSelectionListener {
 	//Optionally set the look and feel.
 	private static boolean useSystemLookAndFeel = false;
 
-	public DisplayTree(Tree theTree) {
+	public DisplayTree(BinaryTree theTree) {
 		super(new GridLayout(1,0));
 
 		Node TheRoot = theTree.getRoot();
@@ -182,7 +184,7 @@ public class DisplayTree extends JPanel implements TreeSelectionListener {
 		}
 	}
 
-	private static void showTree(Tree tree) {
+	private static void showTree(BinaryTree tree) {
 
 		if (useSystemLookAndFeel) {
 			try {
@@ -251,43 +253,35 @@ public class DisplayTree extends JPanel implements TreeSelectionListener {
 
 			private void exampleTest() {
 
-				/*
-				----------- num. punti:32 q:7 bucket size: 2 ----------
-				random node: 6 null
-				starting node: 6 null
-				end node: 16
-				[8, 7, 6]
-				[5, 7, 6]
-				*/
 				int numPunti 	= 32;
 				int queryPoint 	= 2;
 				int bucketSize 	= 3;
 				int k 			= 3;
-				//int splitValueStartingNode = 6;
-				
-				BucketBinaryTree tree = new BucketBinaryTree(bucketSize);
+
+				Distance<Integer> distance = new IntegerDistance();
+				BinaryTree<Integer> tree = new BinaryTree<Integer>(bucketSize, distance);
 				for (int i = 0; i < numPunti; i++) {
 					tree.insert(i);
 				}
-				System.err.println("queryPoint: " + queryPoint + " k: " + k);
-				Result result = tree.randomNearestQuery(queryPoint, k);
-				System.out.println(result);
 				showTree(tree);
+				
+				System.err.println("queryPoint: " + queryPoint + " k: " + k);
+				Result<Integer> result = tree.nearestQuery(queryPoint, k);
+				System.out.println(result);
+				
 			}
 
 			private void drawTree() {
 
 				int bucketSize = 2;
 				long numPunti   = 2048;
-				BucketBinaryTree tree = new BucketBinaryTree(bucketSize);
+				Distance<Integer> distance = new IntegerDistance();
+				BinaryTree<Integer> tree = new BinaryTree<Integer>(bucketSize, distance);
 
 				for (int i = 0; i < numPunti; i++) {
 					tree.insert(i);
-					//tree.insert2(i);
 					//printProgress(i, numPunti);
-
 				}
-
 				//tree.buildListSide2();
 
 				/*
@@ -309,23 +303,6 @@ public class DisplayTree extends JPanel implements TreeSelectionListener {
 						"\n RR: " + tree.right_rightSideNodes);
 				 */
 				showTree(tree);
-
-				int queryPoint = 5;
-				int k = 3;
-				Result result = tree.nearestQueryWithEndingNode(queryPoint, k);
-				System.out.println(result);
-				System.out.println(result.getEndingNode());
-				
-				/*
-				System.out.println("Right nodes");
-				for (BucketNode n : tree.rightSideNodes) {
-					System.out.println(n);
-				}
-				System.out.println("Left nodes");
-				for (BucketNode n : tree.leftSideNodes) {
-					System.out.println(n);
-				}
-				 */
 			}
 
 			private void printProgress(int i, long numPunti) {
@@ -340,71 +317,8 @@ public class DisplayTree extends JPanel implements TreeSelectionListener {
 				}	
 			}
 
-			private void testStartingNodeKdTree() {
 
-				int bucketSize 		= 2;
-				int maxCoordValue   = 5;
-
-				KdTree tree = KdTree.buildSampleKdTree(bucketSize, maxCoordValue);
-
-				/*
-				 * display the kd tree
-				 */
-				showTree(tree);
-
-				/*
-				 * query info
-				 */
-				Point queryPoint = new Point(2, 1);
-				int k = 5;
-
-				/*
-				 * test the starting query node selection using 4 different ways
-				 */
-				TestResult tr = null;
-				tr = tree.testFindStartingNode(tree, queryPoint);
-				tr.printResults("BASE:");
-
-				tr = tree.testFindStartingNodeSide(tree, queryPoint);
-				tr.printResults("SIDE:");
-
-				tr = tree.testFindStartingNodeMinMax(tree, queryPoint);
-				tr.printResults("MINMAX");
-
-				tr = tree.testFindStartingNodeMinMaxSide(tree, queryPoint);
-				tr.printResults("SIDE-MINMAX");
-			}
-
-			private void preliminaryTestRandomQueriesCorrectness() {
-
-				int bucketSize 		= 2;
-				int maxCoordValue   = 5;
-
-				KdTree tree = KdTree.buildSampleKdTree(bucketSize, maxCoordValue);
-
-				/*
-				 * display the kd tree
-				 */
-				showTree(tree);
-
-				/*
-				 * query info
-				 */
-				Point queryPoint = new Point(2, 1);
-				int k = 5;
-
-
-				KdResult result = tree.nearestQuery(queryPoint, k);
-				System.out.println(result);
-
-				KdResult resultRandom = tree.randomNearestQuery
-						(queryPoint, k, true, false);
-				System.out.println(resultRandom);
-
-
-
-			}
-
+			
 			private void executeCorrectnessTests() {
 				/*
 				 * parametri del kd tree
@@ -546,103 +460,6 @@ public class DisplayTree extends JPanel implements TreeSelectionListener {
 			}	
 
 
-			private void executeTests2() {
-
-				int bucketSize = 0;
-				int numPunti   = 0;
-
-				for ( bucketSize = 3; bucketSize < 4; bucketSize ++) {
-					for ( numPunti = 16; numPunti < 17; numPunti++ ) {
-
-						BucketBinaryTree tree = new BucketBinaryTree(bucketSize);
-
-						for (int i = 0; i < numPunti; i++) {
-							tree.insert(i);	
-						}
-
-						int k = 3;
-						int queryPoint   = 0;
-
-						for ( queryPoint = 2; queryPoint < 3; queryPoint++) {
-
-							Result result = tree.nearestQuery(queryPoint, k);
-							Result result2 = tree.randomNearestQuery(queryPoint, k);
-
-							Integer[] tmp  = result.getPoints();
-							Integer[] tmp2 = result2.getPoints();
-
-							Arrays.sort(tmp);
-							Arrays.sort(tmp2);
-
-							System.out.println();
-						}
-					}					
-				}				
-			}
-
-			private void executeTests() {
-
-				int bucketSize = 0;
-				int numPunti   = 0;
-
-				for ( bucketSize = 3; bucketSize < 5; bucketSize ++) {
-					for ( numPunti = 128; numPunti < 150; numPunti++ ) {
-
-						BucketBinaryTree tree = new BucketBinaryTree(bucketSize);
-
-						for (int i = 0; i < numPunti; i++) {
-							tree.insert(i);	
-						}
-
-						int queryPoint   = 0;
-						Integer numTests = 0;
-						Double totPercRoot         = (double) 0, totPercRootMinMax         = (double) 0;
-						Double totPercNoRoot       = (double) 0, totPercNoRootMinMax       = (double) 0;
-						Double kAvgPercRoot        = (double) 0, kAvgPercRootMinMax        = (double) 0;
-						Double kAvgPercNoRoot  	   = (double) 0, kAvgPercNoRootMinMax  	   = (double) 0;
-						Double totPercRootSide     = (double) 0, totPercRootMinMaxSide     = (double) 0;
-						Double totPercNoRootSide   = (double) 0, totPercNoRootMinMaxSide   = (double) 0;
-						Double kAvgPercRootSide    = (double) 0, kAvgPercRootMinMaxSide    = (double) 0;
-						Double kAvgPercNoRootSide  = (double) 0, kAvgPercNoRootMinMaxSide  = (double) 0;
-
-
-						for ( queryPoint = 0; queryPoint < numPunti; queryPoint++) {
-
-							TestResult r1 = tree.testFSN(tree, queryPoint);
-							TestResult r2 = tree.testFSNMinMax(tree, queryPoint);
-							TestResult r3 = tree.testFSNSide(tree, queryPoint);
-							TestResult r4 = tree.testFSNMinMaxSide(tree, queryPoint);
-
-							numTests++;
-
-							totPercRoot			= totPercRoot         + r1.percNumRoot;
-							totPercNoRoot		= totPercNoRoot       + r1.percNumNoRoot;
-							totPercRootMinMax	= totPercRootMinMax   + r2.percNumRoot;
-							totPercNoRootMinMax	= totPercNoRootMinMax + r2.percNumNoRoot;
-
-							totPercRootSide			= totPercRootSide         + r3.percNumRoot;
-							totPercNoRootSide		= totPercNoRootSide       + r3.percNumNoRoot;
-							totPercRootMinMaxSide	= totPercRootMinMaxSide   + r4.percNumRoot;
-							totPercNoRootMinMaxSide	= totPercNoRootMinMaxSide + r4.percNumNoRoot;
-						}
-
-						kAvgPercRoot 		 = totPercRoot 		   / numTests;
-						kAvgPercNoRoot       = totPercNoRoot 	   / numTests;
-						kAvgPercRootMinMax   = totPercRootMinMax   / numTests;
-						kAvgPercNoRootMinMax = totPercNoRootMinMax / numTests;
-
-						kAvgPercRootSide 		 = totPercRootSide 		   / numTests;
-						kAvgPercNoRootSide       = totPercNoRootSide 	   / numTests;
-						kAvgPercRootMinMaxSide   = totPercRootMinMaxSide   / numTests;
-						kAvgPercNoRootMinMaxSide = totPercNoRootMinMaxSide / numTests;
-
-						System.out.println(bucketSize + ";" + kAvgPercNoRoot + ";" + kAvgPercNoRootMinMax );
-						System.out.println(bucketSize + ";" + kAvgPercNoRootSide + ";" + kAvgPercNoRootMinMaxSide );
-						System.out.println();
-
-					}					
-				}				
-			}
 		});
 	}
 

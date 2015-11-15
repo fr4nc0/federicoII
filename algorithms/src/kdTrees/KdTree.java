@@ -1,8 +1,5 @@
 package kdTrees;
 
-import graphics.Node;
-import graphics.Tree;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -11,7 +8,7 @@ import binaryTrees.TestResult;
 import kdTrees.KdNode.Side;
 
 
-public class KdTree implements Tree {
+public class KdTree {
 
 	/*
 	 * it is used only for tests
@@ -894,7 +891,7 @@ public class KdTree implements Tree {
 		return allNodes;
 	}
 
-	public Node getRoot() {
+	public KdNode getRoot() {
 		return root;
 	}
 

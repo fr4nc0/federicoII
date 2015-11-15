@@ -1,18 +1,15 @@
 package binaryTrees;
 
-import graphics.Node;
-import graphics.Tree;
 
-import java.io.ObjectInputStream.GetField;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import binaryTrees.BucketNode.Side;
+import tree.Side;
 
 
 
-public class BucketBinaryTree implements Tree{
+public class BucketBinaryTree implements BinaryTree {
 
 	/*
 	 * it is used only for tests
@@ -26,7 +23,7 @@ public class BucketBinaryTree implements Tree{
 	public static List<BucketNode> right_leftSideNodes;
 	public static List<BucketNode> right_rightSideNodes;
 
-	private BucketNode root;
+	private NodeMinMax root;
 	private int bucketSize;
 
 	private final String none 			= "none";
@@ -35,7 +32,7 @@ public class BucketBinaryTree implements Tree{
 
 
 
-	public Node getRoot() {
+	public NodeMinMax getRoot() {
 		return root;
 	}
 

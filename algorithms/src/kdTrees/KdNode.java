@@ -1,14 +1,12 @@
 package kdTrees;
 
-import graphics.Node;
-
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
 import org.omg.PortableServer.POA;
 
-public class KdNode implements Node{
+public class KdNode {
 
 	private KdNode 		left;
 	private KdNode 		right;

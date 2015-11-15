@@ -1,8 +1,6 @@
 package kdTrees;
 
 import static org.junit.Assert.*;
-import binaryTrees.BucketNode.Side;
-
 import java.util.Arrays;
 import java.util.Comparator;
 

@@ -1,13 +1,12 @@
 package binaryTrees;
 
-import graphics.Node;
 
 import java.util.Arrays;
 import java.util.List;
 
-import org.omg.PortableServer.POA;
+import tree.Side;
 
-public class BucketNode implements Node {
+public class BucketNode {
 
 	private BucketNode 	left;
 	private BucketNode 	right;
@@ -23,7 +22,7 @@ public class BucketNode implements Node {
 	private int			maxValue;
 	private Side		side; 
 
-	public enum Side { LEFT, RIGHT, NONE, LEFT_LEFT, LEFT_RIGHT, RIGHT_LEFT, RIGTH_RIGHT};
+	//public enum Side { LEFT, RIGHT, NONE, LEFT_LEFT, LEFT_RIGHT, RIGHT_LEFT, RIGTH_RIGHT};
 
 	public BucketNode(int value, int bucketSize, List<BucketNode> allNodes) {
 
@@ -81,8 +80,6 @@ public class BucketNode implements Node {
 		}
 		return res;
 	}
-
-
 
 	@Override
 	public String toString() {
